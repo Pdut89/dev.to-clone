@@ -1,4 +1,3 @@
-const { v4: uuid } = require('uuid')
 const { validationResult } = require('express-validator')
 const mongoose = require('mongoose')
 const HttpError = require('../models/http-error')
@@ -35,50 +34,37 @@ const createComment = async (req, res, next) => {
 			new HttpError('Invalid inputs passed, please check your data', 422)
 		)
 	}
-	const { parentPost, body, author, date, parentId, userId } = req.body
-	let post
-	try {
-		post = await Post.findById(parentPost) //check if the post ID exists
-	} catch (err) {
-		console.error(err)
-		return next(new HttpError('Creating comment failed, please try again', 500))
-	}
-
-	if (!post) {
-		return next(new HttpError('Could not find post for provided ID', 404))
-	}
-
-	let user
-	try {
-		user = await User.findById(author) //check if the user ID exists
-	} catch (err) {
-		console.error(err)
-		return next(new HttpError('Creating comment failed, please try again', 500))
-	}
-
-	if (!user) {
-		return next(new HttpError('Could not find user for provided ID', 404))
-	}
-
-	let createdComment = new Comment({
-		parentId,
-		parentPost,
-		body,
-		author,
-		date,
-	})
 
 	try {
-		const sess = await mongoose.startSession()
-		sess.startTransaction()
+		const { parentPost, body, author, date, parentId, userId } = req.body
+
+		const post = await Post.findById(parentPost) //check if the post ID exists
+		if (!post) {
+			return next(new HttpError('Could not find post for provided ID', 404))
+		}
+
+		const user = await User.findById(author) //check if the user ID exists
+		if (!user) {
+			return next(new HttpError('Could not find user for provided ID', 404))
+		}
+
+		let createdComment = new Comment({
+			parentId,
+			parentPost,
+			body,
+			author,
+			date,
+		})
+
 		createdComment = await Comment.populate(createdComment, { path: 'author' })
 		post.comments.push(createdComment)
 		user.comments.push(createdComment)
 		createdComment.likes.push(author)
-		await createdComment.save({ session: sess })
-		await post.save({ session: sess })
-		await user.save({ session: sess })
-		await sess.commitTransaction()
+
+		await createdComment.save()
+		await post.save()
+		await user.save()
+
 		if (post.author.toString() !== userId) {
 			await commentNotification(
 				userId, //sender
@@ -87,11 +73,14 @@ const createComment = async (req, res, next) => {
 				post.author.toString() //author => receiver
 			)
 		}
-	} catch (err) {
-		console.error(err)
+
+		res
+			.status(201)
+			.json({ comment: createdComment.toObject({ getters: true }) })
+	} catch (error) {
+		console.error(error)
 		return next(new HttpError('Creating comment failed, please try again', 500))
 	}
-	res.status(201).json({ comment: createdComment.toObject({ getters: true }) })
 }
 
 const updateComment = async (req, res, next) => {
@@ -123,42 +112,38 @@ const updateComment = async (req, res, next) => {
 }
 
 const deleteComment = async (req, res, next) => {
-	const { commentId } = req.params
-	let comment
 	try {
-		comment = await Comment.findById(commentId)
+		const { commentId } = req.params
+		const comment = await Comment.findById(commentId)
 			.populate('author')
 			.populate('parentPost')
-	} catch (err) {
-		return next(new HttpError('Could not delete comment.', 500))
-	}
-	if (!comment) {
-		return next(
-			new HttpError('Could not find comment for the provided ID.', 404)
-		)
-	}
-	if (comment.author.id !== req.body.author) {
-		return next(new HttpError('You are not allowed to delete the comment', 401))
-	}
 
-	try {
-		const sess = await mongoose.startSession()
-		sess.startTransaction()
-		await comment.remove({ session: sess })
+		if (!comment) {
+			return next(
+				new HttpError('Could not find comment for the provided ID.', 404)
+			)
+		}
+		if (comment.author.id !== req.body.author) {
+			return next(
+				new HttpError('You are not allowed to delete the comment', 401)
+			)
+		}
+
+		await comment.remove()
 		comment.author.comments.pull(comment)
 		comment.parentPost.comments.pull(comment)
-		await comment.author.save({ session: sess })
-		await comment.parentPost.save({ session: sess })
+
+		await comment.author.save()
+		await comment.parentPost.save()
 		await removeCommentNotification(
 			comment.author.id,
 			comment.parentPost.id,
 			commentId,
 			comment.parentPost.author
 		)
-		await sess.commitTransaction()
-	} catch (err) {
+	} catch (error) {
+		console.error(error)
 		return next(new HttpError('Deleting comment failed, please try again', 500))
-		return next(error)
 	}
 	res.status(201).json({ message: 'Deleted comment' })
 }

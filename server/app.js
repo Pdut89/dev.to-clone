@@ -80,6 +80,7 @@ app.get('/', (req, res) => {
 // });
 
 app.use((error, req, res, next) => {
+	console.error('Error in middleware: ', error)
 	if (res.headerSent) {
 		//res already sent ? => don't send res, just forward the error
 		return next(error)
@@ -92,7 +93,7 @@ app.use((error, req, res, next) => {
 })
 
 mongoose
-	.connect(`mongodb://127.0.0.1:27017/${DB_NAME}?retryWrites=true`, {
+	.connect(`mongodb://127.0.0.1:27017/${DB_NAME}`, {
 		useUnifiedTopology: true,
 		useNewUrlParser: true,
 		useCreateIndex: true,
