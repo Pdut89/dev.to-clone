@@ -13,7 +13,7 @@ const uploadToCloudinary = async (file) => {
     const file64 = parser.format(extName, file.buffer);
 
     const uploadedResponse = await cloudinary.uploader.upload(file64.content, {
-      upload_preset: 'devto',
+      upload_preset: 'ml_default',
     });
     return uploadedResponse.url;
   } catch (err) {
