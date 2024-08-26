@@ -80,7 +80,7 @@ app.get('/', (req, res) => {
 // });
 
 app.use((error, req, res, next) => {
-	console.error('Error in middleware: ', error)
+	console.error('Server error: ', error)
 	if (res.headerSent) {
 		//res already sent ? => don't send res, just forward the error
 		return next(error)
