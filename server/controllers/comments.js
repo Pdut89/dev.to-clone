@@ -1,30 +1,33 @@
 const { validationResult } = require('express-validator')
-const mongoose = require('mongoose')
+
 const HttpError = require('../models/http-error')
 const Comment = require('../models/comment')
 const User = require('../models/user')
 const Post = require('../models/post')
+
 const {
 	commentNotification,
 	removeCommentNotification,
 } = require('../controllers/notifications')
 
 const getCommentsByPostId = async (req, res, next) => {
-	const { postId } = req.params
-	let comments
 	try {
-		comments = await Comment.find({ parentPost: postId }).populate('author')
-	} catch (err) {
+		const { postId } = req.params
+		const comments = await Comment.find({ parentPost: postId }).populate(
+			'author'
+		)
+		if (!comments || comments.length === 0) {
+			return res.status(200).json({ message: 'No comments for the post' })
+		}
+		res.json({
+			comments: comments.map((comment) => comment.toObject({ getters: true })),
+		})
+	} catch (error) {
+		console.error(error)
 		return next(
 			new HttpError('Fetching comments failed. Please try again', 500)
 		)
 	}
-	if (!comments || comments.length === 0) {
-		return res.status(200).json({ message: 'No comments for the post' })
-	}
-	res.json({
-		comments: comments.map((comment) => comment.toObject({ getters: true })),
-	})
 }
 
 const createComment = async (req, res, next) => {
@@ -84,29 +87,23 @@ const createComment = async (req, res, next) => {
 }
 
 const updateComment = async (req, res, next) => {
-	const { commentId } = req.params
-
-	let comment
 	try {
-		comment = await Comment.findById(commentId).populate('author')
-	} catch (err) {
-		return next(new HttpError('Could not update post, please try again!', 500))
-	}
+		const { commentId } = req.params
+		const comment = await Comment.findById(commentId).populate('author')
 
-	if (comment.author.id !== req.body.author) {
-		return next(
-			new HttpError('You are not allowed to update the comment!', 401)
-		)
-	}
+		if (comment.author.id !== req.body.author) {
+			return next(
+				new HttpError('You are not allowed to update the comment!', 401)
+			)
+		}
 
-	comment.body = req.body.body
-
-	try {
+		comment.body = req.body.body
 		await comment.save()
 		res.status(200).json({
 			comment: comment.toObject({ getters: true }),
 		})
-	} catch (err) {
+	} catch (error) {
+		console.error(error)
 		return next(new HttpError('Could not update comment', 500))
 	}
 }
@@ -149,37 +146,40 @@ const deleteComment = async (req, res, next) => {
 }
 
 const likeComment = async (req, res, next) => {
-	const { commentId, userId } = req.body
-	let comment
 	try {
-		comment = await Comment.findByIdAndUpdate(
+		const { commentId, userId } = req.body
+
+		const comment = await Comment.findByIdAndUpdate(
 			commentId,
 			{ $addToSet: { likes: userId } },
 			{ new: true }
 		).populate('author')
-	} catch (err) {
+
+		res.status(200).json({
+			comment: comment.toObject({ getters: true }),
+		})
+	} catch (error) {
+		console.error(error)
 		return next(new HttpError('Could not like comment', 500))
 	}
-	res.status(200).json({
-		comment: comment.toObject({ getters: true }),
-	})
 }
 
 const unlikeComment = async (req, res, next) => {
-	const { commentId, userId } = req.body
-	let comment
 	try {
-		comment = await Comment.findByIdAndUpdate(
+		const { commentId, userId } = req.body
+		const comment = await Comment.findByIdAndUpdate(
 			commentId,
 			{ $pull: { likes: userId } },
 			{ new: true }
 		).populate('author')
-	} catch (err) {
+
+		res.status(200).json({
+			comment: comment.toObject({ getters: true }),
+		})
+	} catch (error) {
+		console.error(error)
 		return next(new HttpError('Could not unlike comment', 500))
 	}
-	res.status(200).json({
-		comment: comment.toObject({ getters: true }),
-	})
 }
 
 exports.getCommentsByPostId = getCommentsByPostId

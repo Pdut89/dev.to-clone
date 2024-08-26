@@ -5,7 +5,6 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
 const cookieSession = require('cookie-session')
-const path = require('path')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
 require('dotenv').config()
@@ -14,7 +13,7 @@ const postsRoutes = require('./routes/posts')
 const usersRoutes = require('./routes/users')
 const commentsRoutes = require('./routes/comments')
 const tagsRoutes = require('./routes/tags')
-const HttpError = require('./models/http-error')
+// const HttpError = require('./models/http-error')
 const { socketHandlers } = require('./utils/socket')
 
 const {
@@ -80,7 +79,7 @@ app.get('/', (req, res) => {
 // });
 
 app.use((error, req, res, next) => {
-	console.error('Error in middleware: ', error)
+	console.error('Server error: ', error)
 	if (res.headerSent) {
 		//res already sent ? => don't send res, just forward the error
 		return next(error)
