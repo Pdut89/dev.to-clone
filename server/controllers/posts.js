@@ -66,46 +66,37 @@ const createPost = async (req, res, next) => {
 	if (!errors.isEmpty()) {
 		return next(new HttpError('Invalid inputs passed, please try again!', 422))
 	}
-	const imageUrl = await uploadToCloudinary(req.file)
-	const { title, body, tags, titleURL, author } = req.body
-	const createdPost = await Post.create({
-		title,
-		image: imageUrl,
-		body,
-		titleURL,
-		author,
-	})
-	await createTags(JSON.parse(tags), createdPost)
-	let user
-	try {
-		user = await User.findById(author) //check if the user ID exists
-	} catch (err) {
-		return next(new HttpError('Creating post failed, please try again', 500))
-	}
-	if (!user) {
-		return next(new HttpError('Could not find user for provided ID', 404))
-	}
 
-	//2 operations to execute:
-	//1. save new doc with the new post
-	//2. add post id to the corresponding user
-	//execute multiple indirectly related operations such that if one fails, we undo all operations: transcations
-	//transcations are built on "sessions"
 	try {
-		const sess = await mongoose.startSession() //start session
-		sess.startTransaction() //start transaction
-		await createdPost.save({ session: sess }) //save new doc with the new post
-		user.posts.push(createdPost) //add post id to the corresponding user
-		//(BTS: MongoDB grabs just the post id and adds it to the "posts" array in the "user" doc)
-		await user.save({ session: sess }) //save the updated user (part of our current session)
-		await sess.commitTransaction() //session commits the transaction
-		//only at this point, the changes are saved in DB... anything goes wrong, EVERYTHING is undone by MongoDB
-	} catch (err) {
+		const { title, body, tags, titleURL, author } = req.body
+
+		const user = await User.findById(author) //check if the user ID exists
+
+		if (!user) {
+			return next(new HttpError('Could not find user for provided ID', 404))
+		}
+
+		const imageUrl = await uploadToCloudinary(req.file)
+		const createdPost = await Post.create({
+			title,
+			image: imageUrl,
+			body,
+			titleURL,
+			author,
+		})
+
+		// Create tags
+		await createTags(JSON.parse(tags), createdPost)
+		user.posts.push(createdPost) // Add post id to the corresponding user
+		await user.save() // Save the updated user
+
+		res.status(201).json({
+			post: createdPost.populate('author').toObject({ getters: true }),
+		})
+	} catch (error) {
+		console.error(error)
 		return next(new HttpError('Creating post failed, please try again', 500))
 	}
-	res.status(201).json({
-		post: createdPost.populate('author').toObject({ getters: true }),
-	})
 }
 
 const updatePost = async (req, res, next) => {
@@ -146,13 +137,10 @@ const updatePost = async (req, res, next) => {
 }
 
 const deletePost = async (req, res, next) => {
-	const { postId } = req.params
-	let post
-
 	try {
+		const { postId } = req.params
 		// Retrieve the post and populate the author
-		post = await Post.findById(postId).populate('author')
-
+		const post = await Post.findById(postId).populate('author')
 		// Check if the post exists
 		if (!post) {
 			return next(
@@ -167,32 +155,15 @@ const deletePost = async (req, res, next) => {
 			)
 		}
 
-		// Start a transaction
-		const sess = await mongoose.startSession()
-		sess.startTransaction()
+		await post.remove()
+		post.author.posts.pull(post)
+		await post.author.save()
 
-		try {
-			// Remove the post and update the author's posts list within the transaction
-			await post.remove({ session: sess })
-			post.author.posts.pull(post)
-			await post.author.save({ session: sess })
-
-			// Commit the transaction
-			await sess.commitTransaction()
-			sess.endSession()
-
-			// Send success response
-			res.status(200).json({ message: 'Deleted post successfully.' })
-		} catch (transactionErr) {
-			// Abort the transaction in case of an error
-			await sess.abortTransaction()
-			sess.endSession()
-			console.error('Transaction error:', transactionErr)
-			return next(new HttpError('Deleting post failed, please try again.', 500))
-		}
-	} catch (err) {
+		// Send success response
+		res.status(200).json({ message: 'Deleted post successfully.' })
+	} catch (error) {
 		// Handle errors that occur outside of the transaction
-		console.error('Error:', err)
+		console.error(error)
 		return next(new HttpError('Could not delete post.', 500))
 	}
 }
