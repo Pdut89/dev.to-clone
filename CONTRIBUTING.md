@@ -48,6 +48,12 @@ $ git pull origin develop
 # Push your branch to GitHub:
 $ git push
 
+# Note: The first branch push must be in this format: 
+git push --set-upstream origin [branchname]
+# For example:
+git push --set-upstream origin feature/add-fallback-images
+
+
 ## NOTE: When your change or bug fix is complete, proceed to open a pull request (Step 6). Otherwise, repeat steps 3 and 4
 ```
 
