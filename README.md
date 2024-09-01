@@ -95,9 +95,10 @@ DB_USER = //user name for db
 DB_PASSWORD = //password for db
 DB_NAME = // name for db
 JWT_KEY = //random string
-COOKIE_KEY = //random string;
-NODE_ENV = 'development';
-CLIENT_URL = //the port of React app, ex: 'http://localhost:3000';
+COOKIE_KEY = //random string
+NODE_ENV = 'development'
+CLIENT_HOST = //the host of React app, ex: 'http://localhost'
+CLIENT_PORT = //the port of React app, ex: '3000'
 
 //cloudinary will provide you with the following credentials
 CLOUDINARY_CLOUD_NAME = //cloud name

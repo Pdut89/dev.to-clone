@@ -19,13 +19,18 @@ const { socketHandlers } = require('./utils/socket')
 const {
 	DB_USER,
 	DB_PASSWORD,
-	DB_URL = 'mongodb://127.0.0.1:27017',
+	DB_HOST = '127.0.0.1',
+	DB_PORT = '27107',
 	DB_NAME = 'devto',
 	COOKIE_KEY,
 	PORT,
 	NODE_ENV,
-	CLIENT_URL,
+	CLIENT_SCHEME = 'http',
+	CLIENT_HOST = 'http://localhost',
+	CLIENT_PORT = '3000',
 } = process.env
+
+const CLIENT_URL = `${CLIENT_SCHEME}://${CLIENT_HOST}:${CLIENT_PORT}`
 
 const httpServer = createServer(app)
 
@@ -93,7 +98,7 @@ app.use((error, req, res, next) => {
 })
 
 mongoose
-	.connect(`${DB_URL}/${DB_NAME}`, {
+	.connect(`mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`, {
 		useUnifiedTopology: true,
 		useNewUrlParser: true,
 		useCreateIndex: true,
