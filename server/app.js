@@ -30,6 +30,8 @@ const {
 
 const httpServer = createServer(app)
 
+console.log('CORS URL: ', CLIENT_URL)
+
 app.set('trust proxy', 1)
 
 app.use(
