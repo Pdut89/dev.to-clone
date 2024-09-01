@@ -19,7 +19,8 @@ const { socketHandlers } = require('./utils/socket')
 const {
 	DB_USER,
 	DB_PASSWORD,
-	DB_NAME,
+	DB_URL = 'mongodb://127.0.0.1:27017',
+	DB_NAME = 'devto',
 	COOKIE_KEY,
 	PORT,
 	NODE_ENV,
@@ -92,7 +93,7 @@ app.use((error, req, res, next) => {
 })
 
 mongoose
-	.connect(`mongodb://127.0.0.1:27017/${DB_NAME}`, {
+	.connect(`${DB_URL}/${DB_NAME}`, {
 		useUnifiedTopology: true,
 		useNewUrlParser: true,
 		useCreateIndex: true,
@@ -100,9 +101,9 @@ mongoose
 	})
 	.then(() => {
 		httpServer.listen(PORT || 5000, () => {
-			console.log('Starting server')
+			console.log(`API Server running on port ${PORT || 5000}`)
 		})
 	})
-	.catch((err) => {
-		console.log(err)
+	.catch((error) => {
+		console.error('Failed to connect to mongo: ', error)
 	})
