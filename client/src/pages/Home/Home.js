@@ -1,33 +1,33 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import Posts from '../../components/Post/Posts'
 import RightSideBar from '../../components/RightSideBar/RightSideBar'
 import LeftSideBar from '../../components/LeftSideBar/LeftSideBar'
 import useHttpClient from '../../hooks/useHttpClient'
-import { AuthContext } from '../../context/auth'
+// import { AuthContext } from '../../context/auth'
 import API_URL from '../../config/apiURL'
 
 const Home = () => {
 	const [tags, setTags] = useState([])
 	const { sendReq, isLoading } = useHttpClient()
-	const { login } = useContext(AuthContext)
+	// const { login } = useContext(AuthContext)
 
-	useEffect(() => {
-		const handleTwitterAuth = async () => {
-			const responseData = await sendReq(
-				`${API_URL}/users/auth/twitter/success`,
-				'GET',
-				null,
-				{
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-					'Access-Control-Allow-Credentials': true,
-				},
-				'include'
-			)
-			login(responseData.user)
-		}
-		handleTwitterAuth()
-	}, [sendReq, login])
+	// useEffect(() => {
+	// 	const handleTwitterAuth = async () => {
+	// 		const responseData = await sendReq(
+	// 			`${API_URL}/users/auth/twitter/success`,
+	// 			'GET',
+	// 			null,
+	// 			{
+	// 				Accept: 'application/json',
+	// 				'Content-Type': 'application/json',
+	// 				'Access-Control-Allow-Credentials': true,
+	// 			},
+	// 			'include'
+	// 		)
+	// 		login(responseData.user)
+	// 	}
+	// 	handleTwitterAuth()
+	// }, [sendReq, login])
 
 	useEffect(() => {
 		const fetchPosts = async () => {

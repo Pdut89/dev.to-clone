@@ -2,16 +2,19 @@ import React, { useContext, useEffect } from 'react'
 import { useHistory, Link } from 'react-router-dom'
 import { AuthContext } from '../../context/auth'
 import { useHttpClient } from '../../hooks/useHttpClient'
-import GLogin from '../../components/Auth/GLogin'
-import GHLogin from '../../components/Auth/GHLogin'
+
 import useForm from '../../hooks/useForm'
 import { loginForm, signupForm } from '../../utils/formConfig'
 import { appendData } from '../../utils'
 import Welcome from '../../components/Auth/Welcome'
 import './Auth.css'
 import ErrorModal from '../../components/Modal/ErrorModal'
-import FBLogin from '../../components/Auth/FBLogin'
-import TwitterLogin from '../../components/Auth/TwitterLogin'
+
+// import FBLogin from '../../components/Auth/FBLogin'
+// import TwitterLogin from '../../components/Auth/TwitterLogin'
+// import GLogin from '../../components/Auth/GLogin'
+// import GHLogin from '../../components/Auth/GHLogin'
+
 import API_URL from '../../config/apiURL'
 
 const Auth = ({ newUser }) => {
@@ -35,60 +38,60 @@ const Auth = ({ newUser }) => {
 	const { sendReq, error, clearError } = useHttpClient()
 
 	//handle google auth
-	const handleGoogleAuth = async (googleData) => {
-		//getting tokenID from GLogin
-		const responseData = await sendReq(
-			`${API_URL}/users/auth/google`,
-			'POST',
-			JSON.stringify({
-				tokenId: googleData.tokenId,
-			}),
-			{
-				'Content-Type': 'application/json', //inform backend the type of data being sent
-			}
-		)
-		let { user } = responseData
-		user = { ...user, token: googleData.tokenId }
-		login(user) //log the user in
-		history.push('/')
-	}
+	// const handleGoogleAuth = async (googleData) => {
+	// 	//getting tokenID from GLogin
+	// 	const responseData = await sendReq(
+	// 		`${API_URL}/users/auth/google`,
+	// 		'POST',
+	// 		JSON.stringify({
+	// 			tokenId: googleData.tokenId,
+	// 		}),
+	// 		{
+	// 			'Content-Type': 'application/json', //inform backend the type of data being sent
+	// 		}
+	// 	)
+	// 	let { user } = responseData
+	// 	user = { ...user, token: googleData.tokenId }
+	// 	login(user) //log the user in
+	// 	history.push('/')
+	// }
 
-	const handleGithubAuth = async (githubData) => {
-		const { code } = githubData
-		const responseData = await sendReq(
-			`${API_URL}/users/auth/github`,
-			'POST',
-			JSON.stringify({ code }),
-			{
-				'Content-Type': 'application/json', //inform backend the type of data being sent
-			}
-		)
-		let { user } = responseData
-		user = { ...user, token: githubData.code }
-		login(user) //log the user in
-		history.push('/')
-	}
+	// const handleGithubAuth = async (githubData) => {
+	// 	const { code } = githubData
+	// 	const responseData = await sendReq(
+	// 		`${API_URL}/users/auth/github`,
+	// 		'POST',
+	// 		JSON.stringify({ code }),
+	// 		{
+	// 			'Content-Type': 'application/json', //inform backend the type of data being sent
+	// 		}
+	// 	)
+	// 	let { user } = responseData
+	// 	user = { ...user, token: githubData.code }
+	// 	login(user) //log the user in
+	// 	history.push('/')
+	// }
 
-	const handleFBAuth = async (fbData) => {
-		const responseData = await sendReq(
-			`${API_URL}/users/auth/facebook`,
-			'POST',
-			JSON.stringify({
-				accessToken: fbData.accessToken,
-				userId: fbData.userID,
-			}),
-			{
-				'Content-Type': 'application/json', //inform backend the type of data being sent
-			}
-		)
-		let { user } = responseData
-		user = { ...user, token: fbData.accessToken }
-		login(user) //log the user in
-		history.push('/')
-	}
+	// const handleFBAuth = async (fbData) => {
+	// 	const responseData = await sendReq(
+	// 		`${API_URL}/users/auth/facebook`,
+	// 		'POST',
+	// 		JSON.stringify({
+	// 			accessToken: fbData.accessToken,
+	// 			userId: fbData.userID,
+	// 		}),
+	// 		{
+	// 			'Content-Type': 'application/json', //inform backend the type of data being sent
+	// 		}
+	// 	)
+	// 	let { user } = responseData
+	// 	user = { ...user, token: fbData.accessToken }
+	// 	login(user) //log the user in
+	// 	history.push('/')
+	// }
 
-	const handleAuthSubmit = async (evt) => {
-		evt.preventDefault()
+	const handleAuthSubmit = async (event) => {
+		event.preventDefault()
 		try {
 			let responseData
 			if (newUser) {
@@ -110,7 +113,9 @@ const Auth = ({ newUser }) => {
 			}
 			login(responseData.user)
 			history.push('/')
-		} catch (err) {}
+		} catch (error) {
+			console.error(error)
+		}
 	}
 
 	return (
@@ -118,16 +123,16 @@ const Auth = ({ newUser }) => {
 			<ErrorModal error={error} onClose={clearError} />
 			<div className='container container-auth'>
 				<Welcome />
-				<div className='auth__social'>
+				{/* <div className='auth__social'>
 					<GLogin onLogin={handleGoogleAuth} />
 					<GHLogin onLogin={handleGithubAuth} />
 					<FBLogin onLogin={handleFBAuth} />
 					<TwitterLogin />
-				</div>
+				</div> */}
 
 				<form className='form__auth'>
 					<div className='form__options'>
-						<p>Or</p>
+						{/* <p>Or</p> */}
 						<h2>
 							{newUser
 								? 'Create a New Account'
