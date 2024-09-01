@@ -8,4 +8,4 @@ server/node_modules
 
 .DS_Store
 
-CONFIG*
+CONFIGURATION.MD
