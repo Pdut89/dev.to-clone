@@ -25,12 +25,8 @@ const {
 	COOKIE_KEY,
 	PORT,
 	NODE_ENV,
-	CLIENT_SCHEME = 'http',
-	CLIENT_HOST = 'http://localhost',
-	CLIENT_PORT = '3000',
+	CLIENT_URL = 'http://localhost:3000',
 } = process.env
-
-const CLIENT_URL = `${CLIENT_SCHEME}://${CLIENT_HOST}:${CLIENT_PORT}`
 
 const httpServer = createServer(app)
 
