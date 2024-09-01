@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator')
+const mongoose = require('mongoose')
 
 const HttpError = require('../models/http-error')
 const Post = require('../models/post')
@@ -14,16 +15,21 @@ const {
 
 const getAllPosts = async (req, res, next) => {
 	try {
+		console.log('MONGOOSE CHECK: ', mongoose.connection.readyState)
+
+		console.log('EXPRESS: Trying to fetch posts')
 		const posts = await Post.find()
 			.sort({ date: 'desc' })
 			.populate('author')
 			.populate('tags')
 
+		console.log('POST response: ', posts)
+
 		res.json({
 			posts: posts.map((post) => post.toObject({ getters: true })),
 		})
 	} catch (error) {
-		console.error(error)
+		console.error('Failed to fetch posts: ', error)
 		return next(new HttpError('Could not fetch posts, please try again', 500))
 	}
 }

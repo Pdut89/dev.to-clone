@@ -101,10 +101,12 @@ mongoose
 		useNewUrlParser: true,
 		useCreateIndex: true,
 		useFindAndModify: false,
+		serverSelectionTimeoutMS: 5000, // https://mongoosejs.com/docs/connections.html#serverselectiontimeoutms
 	})
 	.then(() => {
+		console.log('Mongoose status: ', mongoose.connection.readyState)
 		httpServer.listen(PORT || 5000, () => {
-			console.log(`API Server running on port ${PORT || 5000}`)
+			console.log(`Express server is running on port ${PORT || 5000}`)
 		})
 	})
 	.catch((error) => {
