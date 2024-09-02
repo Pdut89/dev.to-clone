@@ -12,7 +12,7 @@ const {
 	REACT_APP_API_BASE_PATH: path,
 } = process.env
 
-const BASE = `${scheme}://${host}:${port}`
+const BASE = `${scheme}://${host}`
 
 const API_URL = `${BASE}/${path}`
 
