@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
 		return next() //allow the request to continue
 	}
 	try {
-		const token = req.headers.authorization.split(' ')?.[1] //Authorization: 'Bearer TOKEN'
+		const token = req.headers?.authorization?.split(' ')?.[1] //Authorization: 'Bearer TOKEN'
 		// const isCustomAuth = token.length < 500 //> 500 = Google auth
 		if (!token) {
 			throw new Error('Token missing from auth headers.')
