@@ -46,7 +46,7 @@ app.use(bodyParser.json());
 
 app.use(passport.initialize());
 app.use(passport.session());
-// require('./config/passport-twitter')
+require("./config/passport-twitter");
 
 const io = new Server(httpServer, {
 	cors: {
@@ -85,6 +85,12 @@ app.use((error, req, res, next) => {
 	if (res.headerSent) {
 		//res already sent ? => don't send res, just forward the error
 		return next(error);
+	}
+	//Added error message when file is too large
+	if (error.code === "LIMIT_FILE_SIZE") {
+		return res.status(400).json({
+			message: "File size exceeds the 500KB limit.",
+		});
 	}
 	//else, send a res
 	res.status(error.code || 500);
