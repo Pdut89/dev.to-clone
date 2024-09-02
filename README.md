@@ -60,8 +60,8 @@ Clone the repo to your local machine using `https://github.com/eknoorpreet/dev.t
 Install npm dependencies in both `client` and `server` subdirectories using `npm install`
 
 ```shell
-$ cd server && npm install
-$ cd client && npm install
+cd server && npm install
+cd client && npm install
 ```
 
 Set up a MongoDB database either locally or online via <a href='https://www.mongodb.com/cloud/atlas'>MongoDB Atlas</a>
@@ -77,46 +77,57 @@ Set up the following environment variables
 In `client/.env`:
 
 ```js
-REACT_APP_BASE_URL=http://localhost:5000/api
-REACT_APP_SOCKET_IO_URL=http://localhost:5000
-REACT_APP_GOOGLE_CLIENT_ID=<GOOGLE_CLIENT_ID>
-REACT_APP_GITHUB_CLIENT_ID=<GITHUB_CLIENT_ID>
-REACT_APP_FB_APP_ID=<FACEBOOK_CLIENT_ID>
+// Default API URL config
+REACT_APP_API_SCHEME=
+REACT_APP_API_HOST=
+REACT_APP_API_PORT=
+REACT_APP_API_BASE_PATH=
+
+// REACT_APP_GOOGLE_CLIENT_ID=<GOOGLE_CLIENT_ID>
+// REACT_APP_GITHUB_CLIENT_ID=<GITHUB_CLIENT_ID>
+// REACT_APP_FB_APP_ID=<FACEBOOK_CLIENT_ID>
 ```
 
 In `server/.env`:
 
 ```js
-DB_USER = //user name for db
-DB_PASSWORD = //password for db
-DB_NAME = // name for db
-JWT_KEY = //random string
-COOKIE_KEY = //random string;
-NODE_ENV = 'development';
-CLIENT_URL = //the port of React app, ex: 'http://localhost:3000';
+PORT= // Express port
 
-//cloundiary will provide you with the following credentials
-CLOUDINARY_CLOUD_NAME = //cloud name
-CLOUDINARY_API_KEY = //API key
+DB_NAME=
+DB_HOST=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+
+JWT_KEY=jwtkey
+COOKIE_KEY=cookiekey
+
+NODE_ENV='development'
+
+CLIENT_URL= // Client url for CORS config
+
+//cloudinary will provide you with the following credentials
+CLOUDINARY_CLOUD_NAME= //cloud name
+CLOUDINARY_API_KEY= //API key
 CLOUDINARY_API_SECRET; //API secret
 
 //Google will provide you with the following credentials
-GOOGLE_API_KEY = //API key
+// GOOGLE_API_KEY = //API key
 
 //Github will provide you with the following credentials
-GH_CLIENT_ID = //Github's Client ID
-GH_CLIENT_SECRET = //Github's Client Secret
+// GH_CLIENT_ID = //Github's Client ID
+// GH_CLIENT_SECRET = //Github's Client Secret
 
 // Twitter will provide you with the following credentials
-TWITTER_CONSUMER_KEY = //Twitter's Consumer key
-TWITTER_CONSUMER_SECRET = //Twitter's Consumer Secret
+// TWITTER_CONSUMER_KEY = //Twitter's Consumer key
+// TWITTER_CONSUMER_SECRET = //Twitter's Consumer Secret
 ```
 
 Finally, run <code>npm start</code> in both `client` and `server` subdirectories
 
 ```shell
-$ cd server && npm start
-$ cd client && npm start
+cd server && npm start
+cd client && npm start
 ```
 
 ## Screenshots
