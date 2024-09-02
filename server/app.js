@@ -17,12 +17,12 @@ const tagsRoutes = require("./routes/tags");
 const { socketHandlers } = require("./utils/socket");
 
 const {
-	DB_USER,
-	DB_PASSWORD,
-	DB_HOST = "127.0.0.1",
-	DB_PORT = "27017",
-	DB_NAME = "devto",
-	PORT = "5001",
+	// DB_USER,
+	// DB_PASSWORD,
+	DB_HOST,
+	DB_PORT,
+	DB_NAME,
+	PORT,
 	CLIENT_URL = "http://localhost:3000",
 	NODE_ENV,
 	COOKIE_KEY,

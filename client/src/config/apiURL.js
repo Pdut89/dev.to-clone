@@ -1,8 +1,8 @@
 const {
-	REACT_APP_API_SCHEME: scheme = "http",
-	REACT_APP_API_HOST: host = "localhost",
-	REACT_APP_API_PORT: port = 5001,
-	REACT_APP_API_BASE_PATH: path = "api",
+	REACT_APP_API_SCHEME: scheme,
+	REACT_APP_API_HOST: host,
+	REACT_APP_API_PORT: port,
+	REACT_APP_API_BASE_PATH: path,
 } = process.env;
 
 const BASE = `${scheme}://${host}:${port}`;
